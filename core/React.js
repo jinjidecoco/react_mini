@@ -8,6 +8,7 @@ function createTextNode(text) {
   };
 }
 
+// type表示元素类型，props表示元素的属性，是个对象，children表示子元素，剩余参数
 function createElement(type, props, ...children) {
   return {
     type,
