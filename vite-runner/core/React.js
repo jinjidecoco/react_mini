@@ -1,13 +1,12 @@
 function createTextNode(text) {
   console.log("heiheihei!!!!!!!")
-
   return {
     type: "TEXT_ELEMENT",
     props: {
       nodeValue: text,
       children: [],
     },
-  };
+  }
 }
 
 function createElement(type, props, ...children) {
@@ -16,88 +15,97 @@ function createElement(type, props, ...children) {
     props: {
       ...props,
       children: children.map((child) => {
-        return typeof child === "string" ? createTextNode(child) : child;
+        return typeof child === "string" ? createTextNode(child) : child
       }),
     },
-  };
+  }
 }
 
+function render(el, container) {
+  nextWorkOfUnit = {
+    dom: container,
+    props: {
+      children: [el],
+    },
+  }
+}
 
-let nextWorkOfUnit = null; //正在进行的任务
-function workLoop(deadLine){
-  //是否让步
-  let  shouldYield = false;
-
-  while(!shouldYield){
-    //执行任务
-    //判断是否有任务需要执行
-    //如果没有任务需要执行，则让出时间片
-    //如果时间片用完，则继续执行任务
+let nextWorkOfUnit = null
+function workLoop(deadline) {
+  let shouldYield = false
+  while (!shouldYield && nextWorkOfUnit) {
     nextWorkOfUnit = performWorkOfUnit(nextWorkOfUnit)
 
     shouldYield = deadline.timeRemaining() < 1
   }
-  //如果有任务需要执行，则继续执行任务
-  requesIdleCallback(workLoop);
 
+  requestIdleCallback(workLoop)
 }
 
-requesIdleCallback(workLoop)
-
-//实现任务及步骤
-function performWorkOfUnit(work){
-
-  //1.创建dom 设置处理props属性
-  const dom =
-    el.type === "TEXT_ELEMENT"
-      ? document.createTextNode("")
-      : document.createElement(el.type)
-
-      Object.keys(el.props).forEach((key) => {
-        if (key !== "children") {
-          dom[key] = el.props[key]
-        }
-
-  //2.对子节点进行转化转成链表形式,设置指针   parent、child 、sibling
-
-  //3.返回下一个任务
-
-
-
-
-
+function createDom(type) {
+  return type === "TEXT_ELEMENT"
+    ? document.createTextNode("")
+    : document.createElement(type)
 }
 
-
-
-function render(el, container) {
-  // const dom =
-  //   el.type === "TEXT_ELEMENT"
-  //     ? document.createTextNode("")
-  //     : document.createElement(el.type);
-
-  // id class 设置属性
-  Object.keys(el.props).forEach((key) => {
+function updateProps(dom, props) {
+  Object.keys(props).forEach((key) => {
     if (key !== "children") {
-      dom[key] = el.props[key];
+      dom[key] = props[key]
     }
-  });
-
-  const children = el.props.children;
-  children.forEach((child) => {
-    render(child, dom);
-  });
-
-  //插入到容器中
-  container.append(dom);
+  })
 }
+
+function initChildren(fiber) {
+  const children = fiber.props.children
+  let prevChild = null
+  children.forEach((child, index) => {
+    const newFiber = {
+      type: child.type,
+      props: child.props,
+      child: null,
+      parent: fiber,
+      sibling: null,
+      dom: null,
+    }
+
+    if (index === 0) {
+      fiber.child = newFiber
+    } else {
+      prevChild.sibling = newFiber
+    }
+    prevChild = newFiber
+  })
+}
+
+function performWorkOfUnit(fiber) {
+  if (!fiber.dom) {
+    const dom = (fiber.dom = createDom(fiber.type))
+
+    fiber.parent.dom.append(dom)
+
+    updateProps(dom, fiber.props)
+  }
+
+  initChildren(fiber)
+
+  // 4. 返回下一个要执行的任务
+  if (fiber.child) {
+    return fiber.child
+  }
+
+  if (fiber.sibling) {
+    return fiber.sibling
+  }
+
+  return fiber.parent?.sibling
+}
+
+requestIdleCallback(workLoop)
 
 const React = {
   render,
   createElement,
-};
-
-console.log(888,React.createElement("div", null, "9999"))
-
+}
 
 export default React
