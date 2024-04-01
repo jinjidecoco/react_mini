@@ -1,5 +1,6 @@
 function createTextNode(text) {
   console.log("heiheihei!!!!!!!")
+
   return {
     type: "TEXT_ELEMENT",
     props: {
@@ -46,5 +47,8 @@ const React = {
   render,
   createElement,
 };
+
+console.log(888,React.createElement("div", null, "9999"))
+
 
 export default React
