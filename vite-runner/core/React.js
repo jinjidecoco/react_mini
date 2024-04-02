@@ -60,6 +60,7 @@ function initChildren(fiber) {
   const children = fiber.props.children
   let prevChild = null
   children.forEach((child, index) => {
+    console.log('child',child)
     const newFiber = {
       type: child.type,
       props: child.props,
@@ -71,6 +72,7 @@ function initChildren(fiber) {
 
     if (index === 0) {
       fiber.child = newFiber
+      console.log('fiber',fiber)
     } else {
       prevChild.sibling = newFiber
     }
