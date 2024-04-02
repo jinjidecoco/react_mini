@@ -41,13 +41,70 @@ const vnode = {
     ],
   },
 }
+
+// props 包含所有元素的属性（比如 id）和特殊属性 children，children可以包含其他元素
+```
+
+0.简单实现 <div id='root'>hello</div> (小步慢走)
+
+```javascript
+const ele = {
+	type:'div',
+	props:{
+    id:'root',
+    children:['hello']
+	}
+}
+
+const  container = document.getElementById('root');
+const  node  =  document.createElement(ele.type);
+node['id'] = ele.props.id;
+
+const  text  = document.createTextNode('');
+text['nodeValue'] = ele.props.children;
+
+node.appendChild(text);
+container.appendChild(node);
+
 ```
 
 
 
 1.动态实现
 
+
+
+
+
+```javascript
+//实现render,目前只需要添加节点到 DOM
+function render(el, container) {
+  //创建节点
+  const dom = el.type === "TEXT_ELEMENT" ? document.createTextNode('') :          document.createElement(el.type);
+
+  // 属性赋值
+  Object.keys(el.props).forEach(key=> {
+    if(key !== "children"){
+      dom[key] = el.props[key];
+    }
+  })
+
+  const {children}= el.props
+   // 递归渲染子元素
+  if(Array.isArray(children)){
+    children.forEach(child=> {
+      render(child, dom);
+    })
+  }
+	//插入父节点
+  container.appendChild(dom);
+}
+```
+
+
+
 ```react
+//children 可能包含字符串或者数字这类基础类型值，给这里值包裹成 TEXT_ELEMENT 特殊类型，方便后面统一处理。
 function createTextNode(text) {
   return {
     type: "TEXT_ELEMENT",
@@ -58,7 +115,8 @@ function createTextNode(text) {
   }
 }
 
-// type表示元素类型，props表示元素的属性，是个对象，children表示子元素，剩余参数
+// type表示元素类型，props表示元素的属性，是个对象，children表示子元素，剩余参数，它是数组
+//创建节点,实现createElement
 function createElement(type, props, ...children) {
   return {
     type,
@@ -73,7 +131,7 @@ function createElement(type, props, ...children) {
 
 
 function render(el, container) {
-  const   dom = el.type === "TEXT_ELEMENT" ? document.createTextNode('') : document.createElement(el.type);
+  const dom = el.type === "TEXT_ELEMENT" ? document.createTextNode('') :   document.createElement(el.type);
 
   // 添加属性
   Object.keys(el.props).forEach(key=> {
@@ -135,6 +193,8 @@ const  ReactDom = {
 
 ReactDom.createRoot(document.getElementById("root")).render(App)
 ```
+
+
 
 **React.js** 将`createTextNode` `createElement` `render`三个方法放入`core/React.js`中
 
@@ -225,5 +285,4 @@ console.log(App)
     }
 }
 ```
-
 
