@@ -23,13 +23,13 @@ function createElement(type, props, ...children) {
 
 {/* <div id="root">mini-react</div> */}
 
-const ele = {
-  type: "div",
-  props: {
-    id: "root",
-    children: 'mini-react'
-  }
-}
+// const el = {
+//   type: "div",
+//   props: {
+//     id: "root",
+//     children: 'mini-react'
+//   }
+// }
 
 function render(el, container) {
   const dom =

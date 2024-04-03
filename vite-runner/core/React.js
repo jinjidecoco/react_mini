@@ -22,6 +22,7 @@ function createElement(type, props, ...children) {
 }
 
 function render(el, container) {
+  //创建根 fiber，设为下一次的单元任务
   nextWorkOfUnit = {
     dom: container,
     props: {
@@ -31,11 +32,16 @@ function render(el, container) {
 }
 
 let nextWorkOfUnit = null
+
 function workLoop(deadline) {
   let shouldYield = false
+  console.log('nextWorkOfUnit',nextWorkOfUnit)
+  // debugger
+
   while (!shouldYield && nextWorkOfUnit) {
     nextWorkOfUnit = performWorkOfUnit(nextWorkOfUnit)
 
+    console.log('nextWorkOfUnit',nextWorkOfUnit)
     shouldYield = deadline.timeRemaining() < 1
   }
 
@@ -72,7 +78,6 @@ function initChildren(fiber) {
 
     if (index === 0) {
       fiber.child = newFiber
-      console.log('fiber',fiber)
     } else {
       prevChild.sibling = newFiber
     }
@@ -81,8 +86,10 @@ function initChildren(fiber) {
 }
 
 function performWorkOfUnit(fiber) {
+  // debugger
   if (!fiber.dom) {
     const dom = (fiber.dom = createDom(fiber.type))
+    console.log('dom',dom)
 
     fiber.parent.dom.append(dom)
 
@@ -109,5 +116,32 @@ const React = {
   render,
   createElement,
 }
+
+
+
+//mani.js调用
+// ReactDOM.createRoot(document.querySelector("#root")).render(App)
+
+{/*
+<div id="root">
+  <div id='app'></div>
+</div>
+*/}
+
+// {
+//   type: "div",
+//   props: {
+//     id: "app",
+//     children: [
+//       {
+//        type:'TEXT_ELEMENT',
+//        props: {
+//          nodeValue: 'hello world',
+//          children: []
+//        }
+//       }
+//     ]
+//   }
+// }
 
 export default React

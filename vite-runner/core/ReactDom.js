@@ -1,4 +1,4 @@
-import React from "./React.js";
+import React from "./React1.js";
 const ReactDOM = {
   createRoot(container) {
     return {
