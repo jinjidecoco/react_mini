@@ -56,13 +56,11 @@ requestIdleCallback(workLoop)
 
 
 function  createDom(fiber){
-  const dom = fiber.type === "TEXT_ELEMENT"
+  const dom =
+    fiber.type === "TEXT_ELEMENT"
       ? document.createTextNode("")
       : document.createElement(fiber.type)
   console.log("dom", dom)
-
-  // 子节点dom添加到父节点dom之后
-  fiber.parent?.dom.appendChild(dom)
 
   //处理属性
   Object.keys(fiber.props).forEach((key) => {
@@ -70,6 +68,9 @@ function  createDom(fiber){
       dom[key] = fiber.props[key]
     }
   })
+
+  // 子节点dom添加到父节点dom之后
+  fiber.parent?.dom.appendChild(dom)
 
   return dom
 }
